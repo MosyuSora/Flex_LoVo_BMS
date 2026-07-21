@@ -1,0 +1,84 @@
+{
+  "source_variant": "BQ76940 shipping package 20220817, program CAN 20211123, 15-cell variant",
+  "mcu": {
+    "family": "STM32F103",
+    "part_from_schematic": "STM32F103C8T6",
+    "package": "LQFP48",
+    "flash_kb": 64,
+    "ram_kb": 20,
+    "hse_crystal_mhz": 8,
+    "library": "STM32F10x StdPeriph",
+    "note": "以原理图 U1 为准(BQ7694003_DEMO 板 20210906);曾误记为 STM32F103C6,2026-07-10 按原理图更正"
+  },
+  "i2c": [
+    {
+      "name": "bq_i2c1_bitbang",
+      "role": "BQ76940 register access",
+      "scl": "PB8",
+      "sda": "PB9",
+      "mode": "gpio_open_drain_bitbang",
+      "device_7bit_address": "0x08",
+      "write_address_byte": "0x10",
+      "read_address_byte": "0x11",
+      "crc_write": true,
+      "crc_polynomial": "0x07"
+    },
+    {
+      "name": "i2c2_bitbang_spare",
+      "role": "defined but not used by main path",
+      "scl": "PB10",
+      "sda": "PB11",
+      "mode": "gpio_open_drain_bitbang",
+      "device_7bit_address": "0x08",
+      "crc_write": true,
+      "status": "spare_or_legacy"
+    }
+  ],
+  "can": {
+    "name": "can1",
+    "tx": "PA12",
+    "rx": "PA11",
+    "bitrate": 500000,
+    "frame_format": "extended_data_frame",
+    "rx_filter": "accept_all_fifo0",
+    "rx_interrupt_enabled": false
+  },
+  "uart": [
+    {
+      "name": "usart1",
+      "tx": "PA9",
+      "rx": "PA10",
+      "baud": 115200,
+      "role": "debug_and_parameter_command"
+    },
+    {
+      "name": "usart2",
+      "tx": "PA2",
+      "rx": "PA3",
+      "baud": 9600,
+      "role": "display_or_bluetooth_stream"
+    },
+    {
+      "name": "usart3",
+      "baud": 9600,
+      "role": "legacy_function_not_called_by_main",
+      "status": "no_gpio_init_in_shipping_source"
+    }
+  ],
+  "gpio": [
+    { "name": "MCU_KZ_QB_POWER", "pin": "PA0", "direction": "output", "initial": "TODO" },
+    { "name": "MCU_D_POWER", "pin": "PA1", "direction": "output", "initial": "TODO" },
+    { "name": "MCU_WAKE_BQ", "pin": "PA8", "direction": "output", "initial": "pulse_high_then_low" },
+    { "name": "MCU_KZ_P2", "pin": "PA12", "direction": "legacy_output_init_overwritten", "initial": 0, "final_owner": "CAN1_TX", "status": "legacy_alias_not_board_output" },
+    { "name": "MCU_IN_STA1", "pin": "PB12", "direction": "output", "initial": 1 },
+    { "name": "STA_WAKE", "pin": "PB1", "direction": "output", "initial": "TODO" },
+    { "name": "MCU_BQ1_ART", "pin": "PB2", "direction": "output", "initial": "TODO", "warning": "name suggests alert but code configures output" },
+    { "name": "PB3", "pin": "PB3", "direction": "output", "initial": 0 },
+    { "name": "PB4", "pin": "PB4", "direction": "output", "initial": 0 },
+    { "name": "PB5", "pin": "PB5", "direction": "output", "initial": 0 },
+    { "name": "LED1", "pin": "PA15", "direction": "output" },
+    { "name": "LED2", "pin": "PB13", "direction": "output" },
+    { "name": "LED3", "pin": "PB14", "direction": "output" },
+    { "name": "LED4", "pin": "PB15", "direction": "output" }
+  ]
+}

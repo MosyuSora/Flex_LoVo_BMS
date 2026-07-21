@@ -1,0 +1,155 @@
+/*
+ * 板级 devicetree overlay:只放硬件事实(引脚/地址/时钟/芯片参数)。
+ * Based on docs/board-facts/pinmap.json and bq76940_config.json.
+ * 主控 = STM32F103C8T6(原理图 U1,LQFP48,64K/20K,板载 8MHz HSE 晶振 CRY1)。
+ *
+ * 时钟当前走 HSI 8MHz:Renode 仿真平台不模拟 HSE 晶振就绪位。
+ * 真机 bring-up 时把下面的"仿真时钟"整块注释掉、启用"真机时钟"整块即可
+ * (HSE 8MHz -> PLL x9 = 72MHz 满速);业务代码零改动,这就是时钟事实进
+ * 设备树的用武之地。
+ */
+
+/* ==== 仿真时钟(默认):HSI 8MHz,无 PLL ==== */
+&clk_hse {
+	status = "disabled";
+};
+
+&pll {
+	status = "disabled";
+};
+
+&clk_hsi {
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&clk_hsi>;
+	clock-frequency = <8000000>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <1>;
+	apb2-prescaler = <1>;
+};
+
+/*
+ * ==== 真机时钟(HSE 8MHz -> PLL x9 -> 72MHz)====
+ * 不在此处手动注释切换(易出错)。真机构建用 `build.ps1 -Hardware`,
+ * 它把 hw.overlay 叠加在本文件之后、覆盖上面的仿真时钟块。
+ * 板级来源与时钟事实见 docs/board-facts/bms_board_facts.md。
+ */
+
+/ {
+	aliases {
+		bms-afe = &bq76940;
+		bms-can = &can1;
+		led-status = &led_status;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		/*
+		 * 状态灯 = 板载 D3,接 PA15(发货原理图网络名 Ctrl_LED),**低有效**:
+		 * 3.3V -> R9(470R) -> D3 -> PA15,PA15 拉低才点亮。
+		 * PA15 是 JTDI,要当 GPIO 必须关 JTAG(见下面 &pinctrl 的 swj-cfg,
+		 * 保留 SWD、不影响 ST-Link)。BQ7694003_DEMO 板上 PB13/14/15 未接灯
+		 * (PB15 是 DISPLAY_POWER_EN),所以状态灯只能用 PA15/D3。
+		 */
+		led_status: led_1 {
+			gpios = <&gpioa 15 GPIO_ACTIVE_LOW>;
+			label = "BMS status LED";
+		};
+	};
+};
+
+/*
+ * 关 JTAG-DP、保留 SW-DP(SWD):释放 PA15/PB3/PB4 作普通 GPIO。
+ * 状态灯 D3 在 PA15(JTDI),没这一步 PA15 停在 JTAG 复用、驱动不了灯。
+ * SWD 仍在,ST-Link 烧录/调试不受影响。
+ */
+&pinctrl {
+	swj-cfg = "jtag-disable";
+};
+
+/* 调试口:USART1 PA9/PA10 115200(与 vendor 工程一致) */
+&usart1 {
+	current-speed = <115200>;
+	status = "okay";
+};
+
+/*
+ * BQ76940 走软件(GPIO 位翻转)I2C,不用硬件 I2C1 外设。
+ * 依据:发货板 pinmap.json 明确 bq_i2c1_bitbang = gpio_open_drain_bitbang(PB8/PB9);
+ * 且 BQ769x0 家族 I2C 对时钟延展/CRC/重复起始时序敏感,vendor 就是用位翻转
+ * 换取时序完全可控。硬件 I2C1 外设在此释放,PB8/PB9 交给 Zephyr gpio-i2c 驱动。
+ * SDA/SCL 都是开漏,真机需外部上拉(发货板已有)。
+ */
+&i2c1 {
+	status = "disabled";
+};
+
+/* STM32F103 IWDG is used by AuxiliaryTask and must exist in simulation too. */
+&iwdg {
+	status = "okay";
+};
+
+/ {
+	bq_i2c: gpio-i2c {
+		compatible = "gpio-i2c";
+		status = "okay";
+		clock-frequency = <I2C_BITRATE_STANDARD>; /* 100k,与 vendor 位翻转同档 */
+		scl-gpios = <&gpiob 8 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		sda-gpios = <&gpiob 9 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		bq76940: bq76940@8 {
+			compatible = "bms,bq76940";
+			reg = <0x08>;
+			status = "okay";
+			/*
+			 * BQ76940 物理 15 个采样口;发货源码按下列 VC 槽位检查
+			 * 9 个实接电芯,不是顺序使用 VC1..VC9。
+			 * cell-count 是"交给算法的逻辑电芯数",不是芯片口数。
+			 * current-lsb-ua = 2110:BoardFacts 电流换算 2.11 mA/LSB。
+			 */
+			cell-count = <9>;
+			cell-channels = <1 2 5 6 7 10 11 12 15>;
+			temp-count = <2>;
+			wake-gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>;
+			current-lsb-ua = <2110>;
+		};
+	};
+};
+
+/* CAN1 @ PA11/PA12,500 kbit/s 扩展帧(BoardFacts can 节) */
+&can1 {
+	status = "okay";
+	pinctrl-0 = <&can_rx_pa11 &can_tx_pa12>;
+	pinctrl-names = "default";
+	bitrate = <500000>;
+};
+
+/* 未使用外设关掉,省 ROM/RAM;USB 与 CAN 在 F103 上互斥 */
+&usb {
+	status = "disabled";
+};
+
+&usart2 {
+	status = "disabled";
+};
+
+&usart3 {
+	status = "disabled";
+};
+
+&i2c2 {
+	status = "disabled";
+};
+
+&spi1 {
+	status = "disabled";
+};
+
+&spi2 {
+	status = "disabled";
+};

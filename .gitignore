@@ -1,0 +1,42 @@
+# Build outputs
+build/
+build_*/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+
+# Zephyr and firmware artifacts
+firmware/build*/
+firmware/*.elf
+firmware/*.bin
+firmware/*.hex
+firmware/*.map
+bootloader/*.elf
+bootloader/*.bin
+bootloader/*.hex
+bootloader/*.map
+bootloader/app_header.bin
+
+# Local toolchains and SDK workspaces
+/Tools/
+/.west/
+
+# Test and host runtime artifacts
+tests/renode/artifacts/
+tests/reports/
+host/python/package/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Logs and local editor state
+*.log
+*.err
+*.err.log
+.vscode/
+.idea/
+.DS_Store

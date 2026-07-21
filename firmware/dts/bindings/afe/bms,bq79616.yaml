@@ -1,0 +1,35 @@
+description: |
+  TI BQ79616-Q1 automotive battery monitor (up to 16 series cells) reached over
+  an isolated differential daisy-chain (UART), NOT I2C. Skeleton driver
+  (drivers/afe/bms_bq79616.c) that implements the same bms_afe_driver_api as the
+  BQ769x0 family — proving the AFE interface is transport-agnostic. Daisy-chain
+  protocol body is a placeholder (see TODO(bq79616) markers).
+
+compatible: "bms,bq79616"
+
+include: base.yaml
+
+properties:
+  uart:
+    type: phandle
+    required: true
+    description: Daisy-chain differential UART device on the base (host) side.
+
+  cell-count:
+    type: int
+    required: true
+    description: Number of logical series cells exposed to the application.
+
+  cell-channels:
+    type: array
+    required: true
+    description: 1-based VC channel number for each logical series cell.
+
+  temp-count:
+    type: int
+    required: true
+    description: Number of thermistor/AUX channels exposed to the application.
+
+  chain-position:
+    type: int
+    description: This device's position/address in the daisy chain.

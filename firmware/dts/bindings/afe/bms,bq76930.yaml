@@ -1,0 +1,35 @@
+description: |
+  TI BQ76930 battery monitor AFE (BQ769x0 family, 6-10 series cells, I2C).
+  Same register interface as BQ76940; driven by the shared family core
+  (drivers/afe/bq769x0_core.c) through bms_afe_driver_api.
+
+compatible: "bms,bq76930"
+
+include: i2c-device.yaml
+
+properties:
+  cell-count:
+    type: int
+    required: true
+    description: Number of logical series cells exposed to the application.
+
+  cell-channels:
+    type: array
+    required: true
+    description: |
+      1-based BQ769x0 VC channel number for each logical series cell
+      (physical wiring map). Length must equal cell-count.
+
+  temp-count:
+    type: int
+    required: true
+    description: Number of thermistor channels exposed to the application.
+
+  current-lsb-ua:
+    type: int
+    required: true
+    description: Coulomb counter LSB in microamps (board sense resistor fact).
+
+  wake-gpios:
+    type: phandle-array
+    description: Optional boot pulse GPIO used to wake the AFE.

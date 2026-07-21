@@ -1,0 +1,13 @@
+// Deprecated name kept as a pointer for readers.
+//
+// The actual Renode startup script now loads Renode's installed STM32F103 model:
+//
+//     machine LoadPlatformDescription @platforms/cpus/stm32f103.repl
+//
+// BMS-specific virtual peripherals live in:
+//
+//     platforms/bms_stm32f103_bq76940_addons.repl
+//
+// Renode platform files are similar to device trees, but they describe the
+// virtual hardware Renode should instantiate, not the firmware's driver binding
+// data.

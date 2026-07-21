@@ -1,0 +1,21 @@
+:name: BMS Zephyr UART smoke
+
+using sysbus
+
+mach create "bms_zephyr_uart"
+machine LoadPlatformDescription @platforms/cpus/stm32f103.repl
+machine LoadPlatformDescription @platforms/bms_stm32f103_bq76940_addons.repl
+machine LoadPlatformDescriptionFromString "bq76940: Mocks.DummyI2CSlave @ i2c1 0x08"
+
+include @peripherals/bq76940_i2c.py
+include @peripherals/firmware_smoke_hooks.py
+setup_bq76940_i2c "sysbus.i2c1.bq76940" "../scenarios/normal_15s_shipping.json"
+bq76940_i2c_self_test "sysbus.i2c1.bq76940"
+
+sysbus.usart1 CreateFileBackend @artifacts/zephyr_uart.log
+sysbus LoadELF @../../firmware/build/zephyr/zephyr.elf
+boot_firmware_from_vector_table 0x08000000
+
+logLevel 3
+emulation RunFor "1.0"
+sysbus.usart1 CloseFileBackend @artifacts/zephyr_uart.log

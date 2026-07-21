@@ -1,0 +1,21 @@
+{
+  "name": "undervoltage_15s_shipping_pack",
+  "cell_count": 15,
+  "active_cell_channels": [1, 2, 5, 6, 7, 10, 11, 12, 15],
+  "cell_mv": [3650, 3652, 0, 0, 3651, 3649, 3653, 0, 0, 3650, 3651, 3652, 0, 0, 2700],
+  "current_ma": 0,
+  "temperatures_c": [25.0, 25.0],
+  "ntc": {
+    "r25_ohm": 10000,
+    "beta": 3380,
+    "pullup_ohm": 10000
+  },
+  "protection_thresholds": {
+    "cell_ov_mv": 4200,
+    "cell_uv_mv": 2800,
+    "charge_ot_c": 55.0,
+    "discharge_ot_c": 70.0,
+    "charge_ut_c": 0.0,
+    "discharge_ut_c": -20.0
+  }
+}

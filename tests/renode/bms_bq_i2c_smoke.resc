@@ -1,0 +1,14 @@
+:name: BMS BQ76940 I2C peripheral smoke
+
+using sysbus
+
+mach create "bms-bq-smoke"
+machine LoadPlatformDescription @platforms/cpus/stm32f103.repl
+machine LoadPlatformDescription @platforms/bms_stm32f103_bq76940_addons.repl
+machine LoadPlatformDescriptionFromString "bq76940: Mocks.DummyI2CSlave @ i2c1 0x08"
+
+include @peripherals/bq76940_i2c.py
+setup_bq76940_i2c "sysbus.i2c1.bq76940" "../scenarios/normal_15s_shipping.json"
+bq76940_i2c_self_test "sysbus.i2c1.bq76940"
+
+logLevel 3

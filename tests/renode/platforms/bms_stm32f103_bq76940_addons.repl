@@ -1,0 +1,27 @@
+// BMS-specific additions on top of Renode's installed STM32F103 CPU platform.
+//
+// Base platform loaded first:
+//   platforms/cpus/stm32f103.repl
+//
+// Base platform already provides:
+//   cpu, nvic, flash, sram, usart1..5, i2c1, i2c2, gpioPortA..G, exti.
+
+// Development board button, copied from Renode's own STM32F103 smoke test.
+button: Miscellaneous.Button @ gpioPortC 13
+    IRQ -> gpioPortC@13
+
+// STM32F103 bxCAN-compatible controller.
+// IRQ mapping follows the STM32F4 STMCAN model style and the STM32F103 vector
+// table range for USB HP/CAN TX, USB LP/CAN RX0, CAN RX1, CAN SCE.
+can1: CAN.STMCAN @ sysbus <0x40006400, +0x400>
+    [0-3] -> nvic@[19-22]
+
+// STM32F103 IWDG used by Zephyr AuxiliaryTask.
+iwdg: Timers.STM32_IndependentWatchdog @ sysbus 0x40003000
+    frequency: 32000
+    windowOption: false
+    defaultPrescaler: 0x4
+
+// The shipping firmware drives BQ76940 through PB8/PB9 GPIO bit-banging, not
+// through this platform's hardware i2c1 controller. The scripted BQ model and
+// GPIO protocol adapter are installed by the .resc test scripts.

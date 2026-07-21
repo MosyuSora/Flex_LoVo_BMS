@@ -1,0 +1,59 @@
+#include <zephyr/dt-bindings/dma/stm32_dma.h>
+
+/*
+ * ============================================================================
+ * 真机时钟树 overlay(bring-up 专用)
+ * ============================================================================
+ *
+ * 与仿真互斥:仿真默认走 app.overlay 里的 HSI 8MHz(Renode 不完整建模
+ * HSE/PLL);真机构建用 build.ps1 -Hardware 叠加本文件,把时钟切到
+ * HSE -> PLL x9 -> 72MHz。板载 CRY1 = 8MHz HSE 晶振(发货原理图 / BoardFacts)。
+ *
+ * 时钟树目标:
+ *   HSE 8MHz --(PLLXTPRE 不分频)--> PLL 输入 8MHz --(x9)--> SYSCLK 72MHz
+ *   AHB  /1 -> HCLK  72MHz
+ *   APB1 /2 -> PCLK1 36MHz   (APB1 上限 36MHz;APB1 定时器仍 72MHz)
+ *   APB2 /1 -> PCLK2 72MHz
+ *   Flash 72MHz => 2 wait states
+ *
+ * 选 72MHz 的理由:
+ *   1. CAN 500k 位时序对时钟精度敏感,必须走 HSE 晶振(HSI ±1% 不满足);
+ *      PCLK1=36MHz 能整除出干净的 CAN 位时序。
+ *   2. 软件 I2C 位翻转、采样节拍在 72MHz 下才有足够余量(8MHz 下采样吃满周期)。
+ *   3. 这是 F103C8T6 的标称满速,厂家发货固件也是 72MHz。
+ *
+ * 板级来源与时钟事实见 docs/board-facts/bms_board_facts.md。
+ */
+
+&clk_hse {
+	clock-frequency = <8000000>;
+	status = "okay";
+};
+
+&pll {
+	mul = <9>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <72000000>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <2>;
+	apb2-prescaler = <1>;
+};
+
+/*
+ * 诊断串口 DMA 发送(真机专用):USART1_TX 固定挂 DMA1 通道 4(F103 通道映射)。
+ * Renode 不建模 DMA,故仅 -Hardware 构建叠加本节 + hw.conf 打开 UART_ASYNC_API;
+ * 仿真构建不带这些,comm_diag 退回 poll_out(见 comm_diag_task.c 的 #if 分支)。
+ */
+&dma1 {
+	status = "okay";
+};
+
+&usart1 {
+	dmas = <&dma1 4 (STM32_DMA_PERIPH_TX | STM32_DMA_PRIORITY_HIGH)>;
+	dma-names = "tx";
+};

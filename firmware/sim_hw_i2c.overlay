@@ -1,0 +1,52 @@
+/*
+ * 仿真专用 overlay:把 BQ76940 从软件 gpio-i2c 切回硬件 I2C1。
+ *
+ * 为什么需要它:真机固件(app.overlay)走软件 I2C,与发货板位翻转一致;
+ * 但 Renode 的 STM32 GPIO 模型不会把"从机拉低的 SDA"反射进 IDR 读回,而
+ * Zephyr 的 gpio-i2c 正是读 IDR 采 SDA(vendor StdPeriph 固件靠 hook
+ * GPIO_ReadInputDataBit 绕过,Zephyr 没有这个符号)。所以位翻转路径无法在
+ * Renode 里跑通。
+ *
+ * 折衷:仿真用硬件 I2C1 的 DummyI2CSlave 路径做**数值等价**回归——BQ 驱动的
+ * 寄存器切面、CRC、单位换算与传输方式无关,硬件/软件 I2C 读到的寄存器值相同。
+ * 位翻转传输本身是 Zephyr 自带驱动(非本项目代码),留待真机验证。
+ *
+ * 用法:仅 Renode 冒烟构建时通过 EXTRA_DTC_OVERLAY_FILE 叠加本文件;
+ * 普通构建/真机不带它,默认软件 I2C。
+ */
+
+/* 关掉软件 I2C 总线 + 其上的 BQ 子节点(释放 PB8/PB9,避免驱动去实例化
+ * 依赖被禁总线的节点导致链接期 device ordinal 未定义) */
+&bq_i2c {
+	status = "disabled";
+};
+
+&bq76940 {
+	status = "disabled";
+};
+
+/* 硬件 I2C1 remap PB8/PB9,挂一份等价的 BQ76940 节点 */
+&i2c1 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_FAST>;
+	pinctrl-0 = <&i2c1_scl_remap1_pb8 &i2c1_sda_remap1_pb9>;
+	pinctrl-names = "default";
+
+	bq76940_hw: bq76940@8 {
+		compatible = "bms,bq76940";
+		reg = <0x08>;
+		status = "okay";
+		cell-count = <9>;
+		cell-channels = <1 2 5 6 7 10 11 12 15>;
+		temp-count = <2>;
+		wake-gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>;
+		current-lsb-ua = <2110>;
+	};
+};
+
+/* 把 AFE 别名指向硬件 I2C 上的实例 */
+/ {
+	aliases {
+		bms-afe = &bq76940_hw;
+	};
+};

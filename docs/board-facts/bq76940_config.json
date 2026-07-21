@@ -1,0 +1,101 @@
+{
+  "source_variant": "BQ76940 shipping package 20220817, program CAN 20211123, 15-cell variant",
+  "cell_count": 15,
+  "logical_cell_count": 9,
+  "active_cell_channels": [1, 2, 5, 6, 7, 10, 11, 12, 15],
+  "inactive_cell_channels": [3, 4, 8, 9, 13, 14],
+  "logical_cell_to_vc_channel": [
+    { "logical_cell": 1, "vc_channel": 1, "batteryval_index": 0 },
+    { "logical_cell": 2, "vc_channel": 2, "batteryval_index": 1 },
+    { "logical_cell": 3, "vc_channel": 5, "batteryval_index": 4 },
+    { "logical_cell": 4, "vc_channel": 6, "batteryval_index": 5 },
+    { "logical_cell": 5, "vc_channel": 7, "batteryval_index": 6 },
+    { "logical_cell": 6, "vc_channel": 10, "batteryval_index": 9 },
+    { "logical_cell": 7, "vc_channel": 11, "batteryval_index": 10 },
+    { "logical_cell": 8, "vc_channel": 12, "batteryval_index": 11 },
+    { "logical_cell": 9, "vc_channel": 15, "batteryval_index": 14 }
+  ],
+  "i2c_7bit_address": "0x08",
+  "crc": {
+    "writes_use_crc": true,
+    "reads_use_crc": false,
+    "polynomial": "0x07",
+    "initial": "0x00"
+  },
+  "registers": {
+    "SYS_STAT": "0x00",
+    "CELLBAL1": "0x01",
+    "CELLBAL2": "0x02",
+    "CELLBAL3": "0x03",
+    "SYS_CTRL1": "0x04",
+    "SYS_CTRL2": "0x05",
+    "PROTECT1": "0x06",
+    "PROTECT2": "0x07",
+    "PROTECT3": "0x08",
+    "OV_TRIP": "0x09",
+    "UV_TRIP": "0x0A",
+    "CC_CFG": "0x0B",
+    "VC1_HI": "0x0C",
+    "VC1_LO": "0x0D",
+    "VC15_HI": "0x28",
+    "VC15_LO": "0x29",
+    "BAT_HI": "0x2A",
+    "BAT_LO": "0x2B",
+    "TS1_HI": "0x2C",
+    "TS1_LO": "0x2D",
+    "TS2_HI": "0x2E",
+    "TS2_LO": "0x2F",
+    "CC_HI": "0x32",
+    "CC_LO": "0x33",
+    "ADCGAIN1": "0x50",
+    "ADCOFFSET": "0x51",
+    "ADCGAIN2": "0x59"
+  },
+  "cell_voltage_register_map": [
+    { "cell": 1, "hi": "0x0C", "lo": "0x0D" },
+    { "cell": 2, "hi": "0x0E", "lo": "0x0F" },
+    { "cell": 3, "hi": "0x10", "lo": "0x11" },
+    { "cell": 4, "hi": "0x12", "lo": "0x13" },
+    { "cell": 5, "hi": "0x14", "lo": "0x15" },
+    { "cell": 6, "hi": "0x16", "lo": "0x17" },
+    { "cell": 7, "hi": "0x18", "lo": "0x19" },
+    { "cell": 8, "hi": "0x1A", "lo": "0x1B" },
+    { "cell": 9, "hi": "0x1C", "lo": "0x1D" },
+    { "cell": 10, "hi": "0x1E", "lo": "0x1F" },
+    { "cell": 11, "hi": "0x20", "lo": "0x21" },
+    { "cell": 12, "hi": "0x22", "lo": "0x23" },
+    { "cell": 13, "hi": "0x24", "lo": "0x25" },
+    { "cell": 14, "hi": "0x26", "lo": "0x27" },
+    { "cell": 15, "hi": "0x28", "lo": "0x29" }
+  ],
+  "fet_control_sys_ctrl2": {
+    "both_off": "0x40",
+    "chg_on_only": "0x41",
+    "dsg_on_only": "0x42",
+    "both_on": "0x43",
+    "chg_bit": "bit0",
+    "dsg_bit": "bit1"
+  },
+  "measurement": {
+    "cell_adc_gain_base_uv": 365,
+    "code_adc_lsb_uv": 382,
+    "current_raw_to_ma_scale": 2.11,
+    "ntc": {
+      "r25_ohm": 10000,
+      "beta": 3380,
+      "reference_temp_c": 25,
+      "pullup_ohm": 10000
+    }
+  },
+  "protection": {
+    "software_ov_mv": 4200,
+    "software_ov_recover_mv": 4100,
+    "software_uv_mv": 2800,
+    "software_uv_recover_mv": 2800,
+    "software_oc_ma": 5000,
+    "hardware_ov_threshold_mv": 4400,
+    "hardware_ov_recover_mv": 4300,
+    "hardware_uv_threshold_mv": 2400,
+    "hardware_uv_recover_mv": 2500
+  }
+}

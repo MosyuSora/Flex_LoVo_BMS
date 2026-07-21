@@ -1,0 +1,18 @@
+mainmenu "BMS Firmware"
+
+config BMS_TEST_TELEMETRY
+	bool "Enable test-only runtime telemetry"
+	default n
+	help
+	  Emit machine-readable thread stack and scheduler samples for the
+	  Renode test dashboard. Keep this disabled in shipping builds.
+
+config BMS_TEST_SKIP_WATCHDOG_FEED
+	bool "Skip watchdog feeds for reset testing"
+	default n
+	depends on BMS_TEST_TELEMETRY
+	help
+	  Keep the application tasks running but intentionally stop feeding the
+	  watchdog. This is only for a deliberate watchdog-reset test image.
+
+source "Kconfig.zephyr"

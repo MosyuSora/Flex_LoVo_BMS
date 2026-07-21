@@ -1,0 +1,37 @@
+description: |
+  TI BQ76940 battery monitor AFE, driven by the project's own
+  bms_afe_driver_api (drivers/afe/bms_bq76940.c).
+
+compatible: "bms,bq76940"
+
+include: i2c-device.yaml
+
+properties:
+  cell-count:
+    type: int
+    required: true
+    description: |
+      Number of logical series cells exposed to the application
+      (the chip itself has 15 physical VC channels).
+
+  cell-channels:
+    type: array
+    required: true
+    description: |
+      1-based BQ76940 VC channel number for each logical series cell.
+      The shipping source checks VC1, VC2, VC5, VC6, VC7, VC10,
+      VC11, VC12 and VC15 for the actual 9-cell assembly.
+
+  temp-count:
+    type: int
+    required: true
+    description: Number of thermistor channels exposed to the application.
+
+  current-lsb-ua:
+    type: int
+    required: true
+    description: Coulomb counter LSB in microamps (board sense resistor fact).
+
+  wake-gpios:
+    type: phandle-array
+    description: Optional TS1 boot pulse GPIO used to wake the AFE.

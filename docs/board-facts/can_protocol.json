@@ -1,0 +1,118 @@
+{
+  "source_variant": "BQ76940 shipping package 20220817, program CAN 20211123, 15-cell variant",
+  "cell_slot_policy": {
+    "physical_vc_slots": 15,
+    "actual_series_cells": 9,
+    "active_cell_channels": [1, 2, 5, 6, 7, 10, 11, 12, 15],
+    "inactive_cell_channels": [3, 4, 8, 9, 13, 14],
+    "note": "Frames 1-5 keep the shipping source's VC1..VC15 slot order. Inactive physical slots are expected to be 0 in 9-cell scenarios."
+  },
+  "bus": {
+    "controller": "CAN1",
+    "bitrate": 500000,
+    "id_type": "extended",
+    "frame_type": "data",
+    "dlc": 8,
+    "byte_order": "big_endian_16bit_values"
+  },
+  "frames": [
+    {
+      "id": "0x0001",
+      "name": "cell_voltage_1_3",
+      "bytes": [
+        { "index": 0, "constant": "0xAA" },
+        { "index": 1, "constant": "0x01" },
+        { "index": 2, "signal": "cell1_mv_hi" },
+        { "index": 3, "signal": "cell1_mv_lo" },
+        { "index": 4, "signal": "cell2_mv_hi" },
+        { "index": 5, "signal": "cell2_mv_lo" },
+        { "index": 6, "signal": "cell3_mv_hi" },
+        { "index": 7, "signal": "cell3_mv_lo" }
+      ]
+    },
+    {
+      "id": "0x0002",
+      "name": "cell_voltage_4_6",
+      "bytes": [
+        { "index": 0, "constant": "0xAA" },
+        { "index": 1, "constant": "0x02" },
+        { "index": 2, "signal": "cell4_mv_hi" },
+        { "index": 3, "signal": "cell4_mv_lo" },
+        { "index": 4, "signal": "cell5_mv_hi" },
+        { "index": 5, "signal": "cell5_mv_lo" },
+        { "index": 6, "signal": "cell6_mv_hi" },
+        { "index": 7, "signal": "cell6_mv_lo" }
+      ]
+    },
+    {
+      "id": "0x0003",
+      "name": "cell_voltage_7_9",
+      "bytes": [
+        { "index": 0, "constant": "0xAA" },
+        { "index": 1, "constant": "0x03" },
+        { "index": 2, "signal": "cell7_mv_hi" },
+        { "index": 3, "signal": "cell7_mv_lo" },
+        { "index": 4, "signal": "cell8_mv_hi" },
+        { "index": 5, "signal": "cell8_mv_lo" },
+        { "index": 6, "signal": "cell9_mv_hi" },
+        { "index": 7, "signal": "cell9_mv_lo" }
+      ]
+    },
+    {
+      "id": "0x0004",
+      "name": "cell_voltage_10_12",
+      "bytes": [
+        { "index": 0, "constant": "0xAA" },
+        { "index": 1, "constant": "0x04" },
+        { "index": 2, "signal": "cell10_mv_hi" },
+        { "index": 3, "signal": "cell10_mv_lo" },
+        { "index": 4, "signal": "cell11_mv_hi" },
+        { "index": 5, "signal": "cell11_mv_lo" },
+        { "index": 6, "signal": "cell12_mv_hi" },
+        { "index": 7, "signal": "cell12_mv_lo" }
+      ]
+    },
+    {
+      "id": "0x0005",
+      "name": "cell_voltage_13_15",
+      "bytes": [
+        { "index": 0, "constant": "0xAA" },
+        { "index": 1, "constant": "0x05" },
+        { "index": 2, "signal": "cell13_mv_hi" },
+        { "index": 3, "signal": "cell13_mv_lo" },
+        { "index": 4, "signal": "cell14_mv_hi" },
+        { "index": 5, "signal": "cell14_mv_lo" },
+        { "index": 6, "signal": "cell15_mv_hi" },
+        { "index": 7, "signal": "cell15_mv_lo" }
+      ]
+    },
+    {
+      "id": "0x0006",
+      "name": "pack_soc_current",
+      "bytes": [
+        { "index": 0, "constant": "0xAA" },
+        { "index": 1, "constant": "0x06" },
+        { "index": 2, "signal": "pack_mv_hi" },
+        { "index": 3, "signal": "pack_mv_lo" },
+        { "index": 4, "signal": "soc_percent_hi" },
+        { "index": 5, "signal": "soc_percent_lo" },
+        { "index": 6, "signal": "current_ma_hi" },
+        { "index": 7, "signal": "current_ma_lo" }
+      ]
+    },
+    {
+      "id": "0x0007",
+      "name": "temperature_and_fet_state",
+      "bytes": [
+        { "index": 0, "constant": "0xAA" },
+        { "index": 1, "constant": "0x07" },
+        { "index": 2, "signal": "temperature_c" },
+        { "index": 3, "signal": "dsg_state_raw" },
+        { "index": 4, "signal": "chg_state_raw" },
+        { "index": 5, "reserved": true },
+        { "index": 6, "reserved": true },
+        { "index": 7, "reserved": true }
+      ]
+    }
+  ]
+}
