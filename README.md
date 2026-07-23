@@ -18,6 +18,7 @@ BQ76940 的有效采样槽位为 `VC1、VC2、VC5、VC6、VC7、VC10、VC11、VC
 | [`host/python/`](host/python/) | Python UART 实时界面和 Renode 虚拟上位机 | [上位机说明](host/README.md) |
 | [`tests/`](tests/) | Renode 平台、回归脚本和电池场景 | [测试说明](tests/README.md) |
 | [`docs/board-facts/`](docs/board-facts/) | 引脚、AFE 参数、CAN 字段和板级事实 | [板级资料](docs/board-facts/README.md) |
+| [`document/`](document/) | 设计记录、调试记录和面试专题材料 | [工程文档](document/README.md) |
 
 Qt 上位机计划放在 `host/qt/`，当前发布版本先提供 Python 方案。
 
